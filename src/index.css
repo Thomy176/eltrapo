@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: #f5f0e6;
+  color: #1e1611;
+  font-family: 'Barlow', 'Roboto', system-ui, sans-serif;
+  margin: 0;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  text-align: left;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #ede8db; }
+::-webkit-scrollbar-thumb { background: #c5b89a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #2d8c4e; }
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+.live-dot { animation: livePulse 1.2s ease-in-out infinite; }
+
+@keyframes scoreGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(45,140,78,0.15); }
+  50% { box-shadow: 0 0 16px rgba(45,140,78,0.35); }
+}
+.live-card { animation: scoreGlow 2s ease-in-out infinite; }
