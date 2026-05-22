@@ -66,44 +66,6 @@ const LiveDataCtx = createContext<LiveCtx>({
   liveFixtures: [], todayFixtures: [], connected: false, openModal: () => {},
 })
 
-// ─── SOCCER BALL LOGO ─────────────────────────────────────────────────────────
-function SoccerBall({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="ballShine" cx="35%" cy="28%" r="65%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9"/>
-          <stop offset="100%" stopColor="#d4d4d4" stopOpacity="0.3"/>
-        </radialGradient>
-        <clipPath id="ballClip">
-          <circle cx="20" cy="20" r="18"/>
-        </clipPath>
-      </defs>
-      {/* Ball base */}
-      <circle cx="20" cy="20" r="18" fill="white" stroke="#c5b89a" strokeWidth="1"/>
-      {/* Patches (traditional soccer ball pattern) */}
-      <g clipPath="url(#ballClip)">
-        {/* Center pentagon */}
-        <polygon points="20,9 25,14 23,20 17,20 15,14" fill="#1e1611"/>
-        {/* Top-left hex segment */}
-        <polygon points="15,14 17,20 12,23 7,19 8,12 13,10" fill="#1e1611" opacity="0.82"/>
-        {/* Top-right hex segment */}
-        <polygon points="25,14 32,12 33,19 28,23 23,20 25,14" fill="#1e1611" opacity="0.82"/>
-        {/* Bottom hex segment */}
-        <polygon points="17,20 23,20 25,26 20,31 15,26" fill="#1e1611" opacity="0.70"/>
-        {/* Bottom-left hex segment */}
-        <polygon points="12,23 17,20 15,26 11,30 6,26 7,19" fill="#1e1611" opacity="0.55"/>
-        {/* Bottom-right hex segment */}
-        <polygon points="28,23 33,19 34,26 29,30 25,26 23,20" fill="#1e1611" opacity="0.55"/>
-      </g>
-      {/* Shine overlay */}
-      <circle cx="20" cy="20" r="18" fill="url(#ballShine)"/>
-      {/* Outer ring */}
-      <circle cx="20" cy="20" r="18" stroke="#2d8c4e" strokeWidth="1.5" fill="none"/>
-    </svg>
-  )
-}
-
 // ─── LIVE BADGE ───────────────────────────────────────────────────────────────
 function LiveBadge({ minute }: { minute?: number }) {
   return (
