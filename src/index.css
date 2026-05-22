@@ -33,3 +33,57 @@ body {
   50% { box-shadow: 0 0 16px rgba(45,140,78,0.35); }
 }
 .live-card { animation: scoreGlow 2s ease-in-out infinite; }
+
+/* ── GOAL INTRO (cinematic) ──────────────────────────────────────────────── */
+@keyframes intro-fade {
+  0%   { opacity: 0 }
+  9%   { opacity: 1 }
+  76%  { opacity: 1 }
+  100% { opacity: 0 }
+}
+@keyframes intro-blur {
+  0%   { backdrop-filter: blur(22px) brightness(0.62) }
+  76%  { backdrop-filter: blur(22px) brightness(0.62) }
+  100% { backdrop-filter: blur(0px)  brightness(1) }
+}
+@keyframes cinema-in {
+  from { transform: scaleY(0) }
+  to   { transform: scaleY(1) }
+}
+@keyframes ball-move-x {
+  from { transform: translateX(-420px) }
+  to   { transform: translateX(0) }
+}
+@keyframes ball-move-y {
+  0%   { transform: translateY(180px) }
+  40%  { transform: translateY(-40px) }
+  100% { transform: translateY(0) }
+}
+@keyframes ball-fly {
+  from { transform: rotate(0deg) scale(0.18) }
+  to   { transform: rotate(1080deg) scale(1) }
+}
+@keyframes net-hit {
+  0%,100% { transform: scale(1,1) }
+  30%     { transform: scale(0.97,1.1) }
+  65%     { transform: scale(1.02,0.97) }
+}
+@keyframes goal-flash {
+  0%   { opacity: 0 }
+  18%  { opacity: 0.32 }
+  100% { opacity: 0 }
+}
+@keyframes gol-pop {
+  0%   { opacity: 0; transform: scale(0.12) rotate(-10deg) }
+  16%  { opacity: 1; transform: scale(1.3) rotate(4deg) }
+  30%  { transform: scale(1) rotate(0deg) }
+  100% { opacity: 1; transform: scale(1) }
+}
+@keyframes logo-rise {
+  from { opacity: 0; transform: translateY(14px) }
+  to   { opacity: 1; transform: translateY(0) }
+}
+@keyframes grass-line {
+  from { transform: scaleX(0); opacity: 0 }
+  to   { transform: scaleX(1); opacity: 1 }
+}

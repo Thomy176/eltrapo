@@ -1,4 +1,4 @@
-import { useState, useMemo, createContext, useContext } from 'react'
+import { useState, useEffect, useMemo, createContext, useContext } from 'react'
 import './index.css'
 import { leagues, allMatches, tournaments, type League, type Zone, type Match, type Team } from './data'
 import { copas, type CopCompetition, type CopGroup } from './copas'
@@ -53,6 +53,171 @@ function zoneBadge(zone: string | null) {
   const c = cfg[zone]
   if (!c) return null
   return <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${c.cls}`}>{c.label}</span>
+}
+
+// ─── GOAL INTRO (cinematic) ───────────────────────────────────────────────────
+function GoalIntro({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 3700)
+    return () => clearTimeout(t)
+  }, [onDone])
+
+  const GW = 440
+  const GH = 158
+
+  const vLines = Array.from({ length: 21 }, (_, i) => 12 + (i + 1) * (GW / 22))
+  const hLines = Array.from({ length: 9  }, (_, i) => (i + 1) * (GH / 10))
+
+  const BAR = '11%'
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] cursor-pointer select-none"
+      style={{
+        background: 'rgba(4, 10, 6, 0.55)',
+        animation: 'intro-fade 3.7s ease forwards, intro-blur 3.7s ease forwards',
+      }}
+      onClick={onDone}
+    >
+      {/* ── Barras cinemáticas ─────────────────────────────── */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0,
+        height: BAR, background: '#000',
+        transformOrigin: 'top center', transform: 'scaleY(0)',
+        animation: 'cinema-in 0.35s ease 0.05s both',
+      }}/>
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        height: BAR, background: '#000',
+        transformOrigin: 'bottom center', transform: 'scaleY(0)',
+        animation: 'cinema-in 0.35s ease 0.05s both',
+      }}/>
+
+      {/* ── Flash blanco al gol ────────────────────────────── */}
+      <div
+        className="absolute inset-0 bg-white pointer-events-none"
+        style={{ opacity: 0, animation: 'goal-flash 0.65s ease 1.62s both' }}
+      />
+
+      {/* ── Contenido (entre las barras) ───────────────────── */}
+      <div style={{
+        position: 'absolute',
+        top: BAR, bottom: BAR, left: 0, right: 0,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        gap: '2.2rem',
+      }}>
+
+        {/* ARCO */}
+        <div style={{ position: 'relative', width: GW + 24, height: GH + 60, overflow: 'visible' }}>
+          <svg
+            width={GW + 24} height={GH + 60}
+            viewBox={`0 0 ${GW + 24} ${GH + 60}`}
+            style={{ overflow: 'visible' }}
+          >
+            {/* Línea del campo */}
+            <line
+              x1={-90} y1={GH + 13} x2={GW + 114} y2={GH + 13}
+              stroke="#3daa60" strokeWidth={2.5} strokeLinecap="round"
+              style={{
+                transformOrigin: `${(GW + 24) / 2}px ${GH + 13}px`,
+                animation: 'grass-line 0.7s ease 0.2s both',
+              }}
+            />
+            {/* Sombra de los postes */}
+            <rect x={14} y={3} width={6} height={GH + 5} rx={2} fill="rgba(0,0,0,0.22)" />
+            <rect x={GW + 14} y={3} width={6} height={GH + 5} rx={2} fill="rgba(0,0,0,0.22)" />
+
+            {/* Red */}
+            <g style={{
+              transformOrigin: `${(GW + 24) / 2}px ${GH / 2}px`,
+              animation: 'net-hit 0.5s ease 1.62s both',
+            }}>
+              <rect x={12} y={0} width={GW} height={GH} fill="rgba(18,52,30,0.2)" />
+              {vLines.map((x, i) => (
+                <line key={`v${i}`} x1={x} y1={0} x2={x} y2={GH}
+                  stroke="rgba(255,255,255,0.18)" strokeWidth={1} />
+              ))}
+              {hLines.map((y, i) => (
+                <line key={`h${i}`} x1={12} y1={y} x2={GW + 12} y2={y}
+                  stroke="rgba(255,255,255,0.18)" strokeWidth={1} />
+              ))}
+            </g>
+
+            {/* Postes y travesaño */}
+            <rect x={9}      y={0} width={7} height={GH + 5} rx={2.5} fill="#f2efe8" />
+            <rect x={GW + 9} y={0} width={7} height={GH + 5} rx={2.5} fill="#f2efe8" />
+            <rect x={9}      y={0} width={GW + 7} height={8}  rx={2.5} fill="#f2efe8" />
+          </svg>
+
+          {/* ⚽ Pelota — wrapper X (lineal) → wrapper Y (arco) → escala+spin */}
+          <div style={{
+            position: 'absolute',
+            left: 384,   // esquina superior derecha
+            top:  26,
+            transform: 'translateX(-420px)',
+            animation: 'ball-move-x 1.15s cubic-bezier(0.25,0.08,0.45,1) 0.52s forwards',
+          }}>
+            <div style={{
+              transform: 'translateY(180px)',
+              animation: 'ball-move-y 1.15s cubic-bezier(0.42,0,0.28,1) 0.52s forwards',
+            }}>
+              <span style={{
+                fontSize: '2.6rem',
+                display: 'block',
+                lineHeight: 1,
+                transform: 'rotate(0deg) scale(0.18)',
+                animation: 'ball-fly 1.15s ease 0.52s forwards',
+              }}>⚽</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ¡GOL! */}
+        <div style={{
+          fontSize: '5.2rem',
+          fontWeight: 900,
+          color: '#fff',
+          letterSpacing: '0.03em',
+          fontFamily: 'inherit',
+          lineHeight: 1,
+          textShadow: '0 0 18px rgba(80,220,110,0.95), 0 0 50px rgba(45,140,78,0.6), 0 3px 10px rgba(0,0,0,0.5)',
+          opacity: 0,
+          animation: 'gol-pop 0.6s cubic-bezier(0.17,0,0,1.45) 1.72s both',
+        }}>
+          ¡GOL!
+        </div>
+
+        {/* Marca */}
+        <div style={{
+          fontSize: '0.75rem',
+          fontWeight: 700,
+          letterSpacing: '0.44em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.38)',
+          opacity: 0,
+          animation: 'logo-rise 0.5s ease 2.25s both',
+        }}>
+          El Trapo
+        </div>
+      </div>
+
+      {/* Skip */}
+      <p style={{
+        position: 'absolute',
+        bottom: 'calc(11% + 0.9rem)',
+        width: '100%',
+        textAlign: 'center',
+        fontSize: '0.6rem',
+        color: 'rgba(255,255,255,0.18)',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+        pointerEvents: 'none',
+      }}>
+        Tocá para saltar
+      </p>
+    </div>
+  )
 }
 
 // ─── LIVE DATA CONTEXT ────────────────────────────────────────────────────────
@@ -1073,6 +1238,7 @@ function HomePage({ favorites }: { favorites: Set<string> }) {
 type Page = 'home' | 'live' | 'leagues' | 'myteams' | 'tournaments' | 'calendar' | 'libertadores' | 'sudamericana'
 
 export default function App() {
+  const [showIntro, setShowIntro]             = useState(true)
   const [page, setPage]                       = useState<Page>('home')
   const [selectedLeague, setSelectedLeague]   = useState<string>('arg')
   const [leagueDropdownOpen, setLeagueDropdown] = useState(false)
@@ -1124,6 +1290,9 @@ export default function App() {
   return (
     <LiveDataCtx.Provider value={liveCtxValue}>
     <div className="min-h-screen bg-[#f5f0e6]">
+
+      {/* Intro animado */}
+      {showIntro && <GoalIntro onDone={() => setShowIntro(false)} />}
 
       {/* Modal de incidencias */}
       {modalFixture && (
