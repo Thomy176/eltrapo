@@ -4,6 +4,16 @@
 
 * { box-sizing: border-box; }
 
+html {
+  cursor: url('/cursor-ball.svg') 14 14, auto;
+}
+
+/* Mantener pelota también en elementos clicables */
+a, button, [role="button"], label, select,
+.cursor-pointer, [class*="cursor-"] {
+  cursor: url('/cursor-ball.svg') 14 14, pointer;
+}
+
 body {
   background-color: #f5f0e6;
   color: #1e1611;

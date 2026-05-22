@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+  <defs>
+    <radialGradient id="shine" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="65%" stop-color="#f2f2f2"/>
+      <stop offset="100%" stop-color="#d4d4d4"/>
+    </radialGradient>
+  </defs>
+  <!-- Ball body -->
+  <circle cx="14" cy="14" r="12.5" fill="url(#shine)" stroke="#111" stroke-width="0.9"/>
+  <!-- Top pentagon -->
+  <path d="M14,3.5 L17.3,6.8 L16.2,10.5 L11.8,10.5 L10.7,6.8Z" fill="#111"/>
+  <!-- Top-right patch -->
+  <path d="M20.5,7 L23.5,11 L21.5,15.5 L17.5,15 L16.2,11 L17.5,7.5Z" fill="#111"/>
+  <!-- Bottom-right patch -->
+  <path d="M20.5,19.5 L17.5,23.5 L13,24 L12.5,20.5 L16,18.5Z" fill="#111"/>
+  <!-- Bottom-left patch -->
+  <path d="M8,24 L4.5,20.5 L6,17.5 L10,17.5 L11.5,20.5Z" fill="#111"/>
+  <!-- Left patch -->
+  <path d="M4.5,15.5 L2.5,11.5 L5,7.5 L8.5,8 L10,11.5 L7.5,15.5Z" fill="#111"/>
+</svg>
