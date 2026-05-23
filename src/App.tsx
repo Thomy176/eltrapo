@@ -1345,7 +1345,7 @@ export default function App() {
             <img
               src="/eltrapo-logo.png"
               alt="El Trapo"
-              className="h-9 w-auto object-contain"
+              className="h-10 w-auto object-contain"
             />
             {/* Indicador de conexión API */}
             <span
