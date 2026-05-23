@@ -1415,7 +1415,11 @@ export default function App() {
                           selectedLeague === l.id ? 'text-[#2d8c4e] font-semibold' : 'text-[#4a3f33]'
                         }`}
                       >
-                        <span className="text-lg">{l.flag}</span>
+                        {l.logo
+                          ? <img src={l.logo} alt={l.name} className="w-7 h-7 object-contain flex-shrink-0"
+                              onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}/>
+                          : <span className="text-lg">{l.flag}</span>
+                        }
                         <div className="text-left">
                           <div>{l.name}</div>
                           <div className="text-xs text-[#9a8e82]">{l.country}</div>
@@ -1486,7 +1490,12 @@ export default function App() {
                       selectedLeague === l.id ? 'text-[#2d8c4e] font-semibold' : 'text-[#7a6e63]'
                     }`}
                   >
-                    {l.flag} {l.name}
+                    {l.logo
+                      ? <img src={l.logo} alt={l.name} className="w-5 h-5 object-contain flex-shrink-0"
+                          onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}/>
+                      : l.flag
+                    }
+                    {l.name}
                   </button>
                 ))}
               </div>
