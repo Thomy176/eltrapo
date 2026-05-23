@@ -4,7 +4,7 @@ import { leagues, allMatches, tournaments, type League, type Zone, type Match, t
 import { copas, type CopCompetition, type CopGroup } from './copas'
 import {
   Activity, Heart, Calendar, Trophy, Radio, Home, ChevronDown,
-  Star, Clock, Zap, Shield, Target, AlertTriangle, Menu, X, Wifi, WifiOff
+  Clock, Zap, Shield, Target, AlertTriangle, Menu, X, Wifi, WifiOff
 } from 'lucide-react'
 import {
   type ApiFixture, type ApiMatchStats,
@@ -1119,117 +1119,136 @@ function LivePage() {
 }
 
 // ─── HOME PAGE ────────────────────────────────────────────────────────────────
-function HomePage({ favorites }: { favorites: Set<string> }) {
-  const { liveFixtures, connected } = useContext(LiveDataCtx)
+function HomePage({ favorites: _favorites }: { favorites: Set<string> }) {
+  const { liveFixtures } = useContext(LiveDataCtx)
 
-  // Fecha dinámica
-  const today = new Date().toISOString().split('T')[0]
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const tomorrowStr = useMemo(() => {
+    const d = new Date(); d.setDate(d.getDate() + 1)
+    return d.toISOString().split('T')[0]
+  }, [])
 
-  const todayLabel = (() => {
-    const d = new Date()
-    const days   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
-    const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-    return `${days[d.getDay()]} ${d.getDate()} de ${months[d.getMonth()]}, ${d.getFullYear()}`
-  })()
+  // Todas las fechas futuras con partidos
+  const upcomingDates = useMemo(() =>
+    [...new Set(allMatches.filter(m => m.date >= todayStr).map(m => m.date))].sort()
+  , [todayStr])
 
-  // ¿La API reporta este partido como live?
-  const isApiLive = (m: Match) => {
-    const home = getTeam(m.leagueId, m.homeId)
-    const away = getTeam(m.leagueId, m.awayId)
-    if (!home || !away) return false
-    const apiF = findApiFixture(liveFixtures, home.name, away.name)
-    return apiF ? isLiveStatus(apiF.fixture.status.short) : false
+  const defaultDay = upcomingDates.includes(tomorrowStr) ? tomorrowStr : (upcomingDates[0] ?? todayStr)
+  const [selectedDay, setSelectedDay] = useState(defaultDay)
+
+  // Partidos en vivo
+  const liveMatches = useMemo(() =>
+    allMatches.filter(m => {
+      if (m.status === 'live') return true
+      if (m.date !== todayStr) return false
+      const home = getTeam(m.leagueId, m.homeId)
+      const away = getTeam(m.leagueId, m.awayId)
+      if (!home || !away) return false
+      const apiF = findApiFixture(liveFixtures, home.name, away.name)
+      return apiF ? isLiveStatus(apiF.fixture.status.short) : false
+    })
+  , [todayStr, liveFixtures])
+
+  // Partidos del día seleccionado, agrupados por liga
+  const byLeague = useMemo(() => {
+    const dayMs = allMatches.filter(m => m.date === selectedDay)
+    return leagues
+      .map(l => ({ league: l, matches: dayMs.filter(m => m.leagueId === l.id) }))
+      .filter(g => g.matches.length > 0)
+  }, [selectedDay])
+
+  // Etiqueta de fecha
+  const dayLabel = (d: string) => {
+    if (d === todayStr)    return 'Hoy'
+    if (d === tomorrowStr) return 'Mañana'
+    const [, mo, dy] = d.split('-')
+    const mnames = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+    return `${parseInt(dy)} ${mnames[parseInt(mo)]}`
   }
 
-  // En vivo: estatus estático 'live' O partidos de hoy que la API confirma como live
-  const liveMatches   = allMatches.filter(m => m.status === 'live' || (m.date === today && isApiLive(m)))
-  // Próximos: de hoy, upcoming, que la API aún no marca como live
-  const upcomingToday = allMatches.filter(m => m.status === 'upcoming' && m.date === today && !isApiLive(m))
-  const favMatches    = allMatches.filter(m => favorites.has(`${m.leagueId}:${m.homeId}`) || favorites.has(`${m.leagueId}:${m.awayId}`))
-
-  const liveCount = connected ? (liveFixtures.length || liveMatches.length) : liveMatches.length
+  // Etiqueta larga de fecha para el encabezado
+  const dayLabelLong = (d: string) => {
+    const [y, mo, dy] = d.split('-')
+    const days   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
+    const months = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+    const date   = new Date(+y, +mo - 1, +dy)
+    return `${days[date.getDay()]} ${parseInt(dy)} de ${months[parseInt(mo)]}`
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-[#ede8db] via-[#e8e2d4] to-[#f0ebe0] border border-[#cfc3aa] rounded-2xl p-6 relative overflow-hidden shadow-sm">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#2d8c4e]/6 rounded-full -translate-y-1/2 translate-x-1/2"/>
-        <div className="relative z-10">
-          <p className="text-[#2d8c4e] text-xs font-bold uppercase tracking-widest mb-2">⚽ {todayLabel}</p>
-          <h1 className="text-3xl font-black text-[#1e1611] mb-1">
-            Bienvenido a <span className="text-[#2d8c4e]">DEPORT</span>
-          </h1>
-          <p className="text-[#7a6e63]">Tu portal de fútbol en tiempo real · 6 ligas · 126 equipos</p>
-          <div className="flex gap-5 mt-4">
-            <div className="text-center">
-              <div className="text-2xl font-black text-[#2d8c4e]">{liveCount}</div>
-              <div className="text-xs text-[#9a8e82] font-medium">EN VIVO</div>
-            </div>
-            <div className="w-px bg-[#cfc3aa]"/>
-            <div className="text-center">
-              <div className="text-2xl font-black text-[#1e1611]">{upcomingToday.length}</div>
-              <div className="text-xs text-[#9a8e82] font-medium">PRÓXIMOS HOY</div>
-            </div>
-            <div className="w-px bg-[#cfc3aa]"/>
-            <div className="text-center">
-              <div className="text-2xl font-black text-[#1e1611]">126</div>
-              <div className="text-xs text-[#9a8e82] font-medium">EQUIPOS</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6">
 
-      {/* En Vivo */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <LiveBadge/>
-          <h2 className="text-lg font-bold text-[#1e1611]">Ahora</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {liveMatches.map(m => <ScoreCard key={m.id} match={m}/>)}
-        </div>
-      </section>
-
-      {/* Próximos hoy */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <Clock size={16} className="text-[#2d8c4e]"/>
-          <h2 className="text-lg font-bold text-[#1e1611]">Próximos Hoy</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {upcomingToday.map(m => <ScoreCard key={m.id} match={m}/>)}
-        </div>
-      </section>
-
-      {/* Favoritos */}
-      {favMatches.length > 0 && (
+      {/* EN VIVO — solo si hay partidos */}
+      {liveMatches.length > 0 && (
         <section>
-          <div className="flex items-center gap-2 mb-4">
-            <Heart size={16} className="text-[#2d8c4e] fill-[#2d8c4e]"/>
-            <h2 className="text-lg font-bold text-[#1e1611]">Mis Equipos</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <LiveBadge />
+            <h2 className="text-sm font-bold text-[#1e1611] uppercase tracking-wide">En Vivo</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {favMatches.map(m => <ScoreCard key={m.id} match={m}/>)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
+            {liveMatches.map(m => <ScoreCard key={m.id} match={m} />)}
           </div>
+          <div className="border-t border-[#ddd8cc] pt-6" />
         </section>
       )}
 
-      {/* Ligas rápidas */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <Star size={16} className="text-amber-600"/>
-          <h2 className="text-lg font-bold text-[#1e1611]">Ligas Destacadas</h2>
+      {/* Selector de jornada */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[10px] text-[#9a8e82] font-bold uppercase tracking-widest mr-1">Jornada</span>
+        {upcomingDates.slice(0, 6).map(d => (
+          <button
+            key={d}
+            onClick={() => setSelectedDay(d)}
+            className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+              selectedDay === d
+                ? 'bg-[#1e1611] text-white border-[#1e1611]'
+                : 'bg-[#f5f0e6] text-[#7a6e63] border-[#cfc3aa] hover:border-[#2d8c4e]/60 hover:text-[#1e1611]'
+            }`}
+          >
+            {dayLabel(d)}
+          </button>
+        ))}
+      </div>
+
+      {/* Encabezado de fecha */}
+      <div className="flex items-center gap-3">
+        <h2 className="text-lg font-black text-[#1e1611]">{dayLabelLong(selectedDay)}</h2>
+        <div className="flex-1 h-px bg-[#ddd8cc]" />
+        <span className="text-xs text-[#9a8e82]">
+          {byLeague.reduce((acc, g) => acc + g.matches.length, 0)} partidos
+        </span>
+      </div>
+
+      {/* Partidos agrupados por liga */}
+      {byLeague.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-4xl mb-3">📅</p>
+          <p className="text-[#9a8e82]">No hay partidos para este día</p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {leagues.map(l => (
-            <div key={l.id} className="bg-[#ede8db] border border-[#cfc3aa] rounded-xl p-4 text-center hover:border-[#2d8c4e]/50 hover:shadow-sm transition-all cursor-pointer">
-              <div className="text-3xl mb-2">{l.flag}</div>
-              <div className="text-xs font-semibold text-[#1e1611]">{l.name}</div>
-              <div className="text-xs text-[#9a8e82] mt-0.5">{l.country}</div>
-            </div>
+      ) : (
+        <div className="space-y-7">
+          {byLeague.map(({ league, matches }) => (
+            <section key={league.id}>
+              {/* Cabecera de liga */}
+              <div className="flex items-center gap-2.5 mb-3">
+                <span className="text-2xl leading-none">{league.flag}</span>
+                <div className="min-w-0">
+                  <span className="font-bold text-[#1e1611] text-sm">{league.name}</span>
+                  <span className="text-xs text-[#9a8e82] ml-2">{league.country}</span>
+                </div>
+                <div className="flex-1 h-px bg-[#ddd8cc] ml-1" />
+                <span className="text-[11px] text-[#9a8e82] flex-shrink-0 tabular-nums">
+                  {matches.length} partido{matches.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              {/* Grid de partidos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {matches.map(m => <ScoreCard key={m.id} match={m} />)}
+              </div>
+            </section>
           ))}
         </div>
-      </section>
+      )}
     </div>
   )
 }
