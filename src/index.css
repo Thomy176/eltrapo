@@ -5,13 +5,13 @@
 * { box-sizing: border-box; }
 
 html {
-  cursor: url('/cursor-ball.svg') 14 14, auto;
+  cursor: url('/trionda-cursor.png') 24 24, auto;
 }
 
-/* Mantener pelota también en elementos clicables */
+/* Pelota Trionda también en elementos clicables */
 a, button, [role="button"], label, select,
 .cursor-pointer, [class*="cursor-"] {
-  cursor: url('/cursor-ball.svg') 14 14, pointer;
+  cursor: url('/trionda-cursor.png') 24 24, pointer;
 }
 
 body {
