@@ -4,7 +4,7 @@ export type Scorer   = { pos: number; name: string; teamId: string; goals: numbe
 export type DisciplineRow = { name: string; teamId: string; ta: number; tr: number };
 export type Match    = { id: string; date: string; time: string; homeId: string; awayId: string; homeScore?: number; awayScore?: number; status: 'live'|'finished'|'upcoming'; minute?: number; leagueId: string; round?: string };
 export type Zone     = { name: string; standings: Standing[] };
-export type League   = { id: string; name: string; country: string; flag: string; champion?: string; teams: Team[]; standings?: Standing[]; zones?: Zone[]; scorers: Scorer[]; discipline: DisciplineRow[]; calendar: Match[] };
+export type League   = { id: string; name: string; country: string; flag: string; logo?: string; champion?: string; teams: Team[]; standings?: Standing[]; zones?: Zone[]; scorers: Scorer[]; discipline: DisciplineRow[]; calendar: Match[] };
 
 // ─── ARGENTINA — Torneo Apertura 2026 ─────────────────────────────────────────
 // Formato: 30 equipos en Zona A y Zona B (15 c/u). 16 fechas. Top 8 → Playoffs.
@@ -1054,22 +1054,22 @@ export const l1Calendar: Match[] = [
 
 // ─── LEAGUES ASSEMBLY ─────────────────────────────────────────────────────────
 export const leagues: League[] = [
-  { id:'arg', name:'Torneo Apertura 2026', country:'Argentina', flag:'🇦🇷',
+  { id:'arg', name:'Torneo Apertura 2026', country:'Argentina', flag:'🇦🇷', logo:'/league-lpf.png',
     teams:argTeams, standings:[], zones:[
       { name:'Zona A', standings:argZoneA },
       { name:'Zona B', standings:argZoneB },
     ], scorers:argScorers, discipline:argDiscipline,
     calendar: argCalendar },
-  { id:'pl',  name:'Premier League',   country:'Inglaterra', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', champion:'Arsenal',
+  { id:'pl',  name:'Premier League',   country:'Inglaterra', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', logo:'/league-premier-league.png', champion:'Arsenal',
     teams:plTeams,  standings:plStandings,  scorers:plScorers,  discipline:plDiscipline,
     calendar: plCalendar },
-  { id:'ll',  name:'La Liga',          country:'España',     flag:'🇪🇸', champion:'Barcelona',
+  { id:'ll',  name:'La Liga',          country:'España',     flag:'🇪🇸', logo:'/league-laliga.png', champion:'Barcelona',
     teams:llTeams,  standings:llStandings,  scorers:llScorers,  discipline:llDiscipline,
     calendar: llCalendar },
-  { id:'sa',  name:'Serie A',          country:'Italia',     flag:'🇮🇹', champion:'Inter Milan',
+  { id:'sa',  name:'Serie A',          country:'Italia',     flag:'🇮🇹', logo:'/league-serie-a.png', champion:'Inter Milan',
     teams:saTeams,  standings:saStandings,  scorers:saScorers,  discipline:saDiscipline,
     calendar: saCalendar },
-  { id:'l1',  name:'Ligue 1',          country:'Francia',    flag:'🇫🇷', champion:'PSG',
+  { id:'l1',  name:'Ligue 1',          country:'Francia',    flag:'🇫🇷', logo:'/league-ligue1.png', champion:'PSG',
     teams:l1Teams,  standings:l1Standings,  scorers:l1Scorers,  discipline:l1Discipline,
     calendar: l1Calendar },
   { id:'pt',  name:'Primeira Liga',    country:'Portugal',   flag:'🇵🇹', champion:'Porto',

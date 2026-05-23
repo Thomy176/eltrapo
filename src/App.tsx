@@ -432,7 +432,14 @@ function ScoreCard({ match }: { match: Match }) {
         ${isClickable ? 'cursor-pointer hover:border-[#2d8c4e] hover:shadow-sm' : 'hover:border-[#2d8c4e]/50'}`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-[#9a8e82]">{league?.flag} {league?.name}</span>
+        <span className="text-xs text-[#9a8e82] flex items-center gap-1">
+          {league?.logo
+            ? <img src={league.logo} alt="" className="h-3.5 w-3.5 object-contain inline-block"
+                onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}/>
+            : league?.flag
+          }
+          {league?.name}
+        </span>
         <div className="flex items-center gap-1.5">
           {isClickable && (
             <span className="text-[9px] text-[#2d8c4e] font-medium uppercase tracking-wide opacity-60">API</span>
@@ -831,7 +838,13 @@ function LeaguePage({ league }: { league: League }) {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <span className="text-3xl">{league.flag}</span>
+        {league.logo
+          ? <img src={league.logo} alt={league.name}
+              className="h-12 w-12 object-contain flex-shrink-0"
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}
+            />
+          : <span className="text-3xl">{league.flag}</span>
+        }
         <div>
           <h2 className="text-2xl font-bold text-[#1e1611]">{league.name}</h2>
           <p className="text-[#9a8e82] text-sm">{league.country} · Temporada 2025/26</p>
@@ -1231,7 +1244,13 @@ function HomePage({ favorites: _favorites }: { favorites: Set<string> }) {
             <section key={league.id}>
               {/* Cabecera de liga */}
               <div className="flex items-center gap-2.5 mb-3">
-                <span className="text-2xl leading-none">{league.flag}</span>
+                {league.logo
+                  ? <img src={league.logo} alt={league.name}
+                      className="h-8 w-8 object-contain flex-shrink-0"
+                      onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}
+                    />
+                  : <span className="text-2xl leading-none">{league.flag}</span>
+                }
                 <div className="min-w-0">
                   <span className="font-bold text-[#1e1611] text-sm">{league.name}</span>
                   <span className="text-xs text-[#9a8e82] ml-2">{league.country}</span>
